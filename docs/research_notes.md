@@ -8,3 +8,7 @@
 - Topic: prion-biology
 - Progress checkpoint logged.
 
+## 2026-10-14T10:50:00 - docs(study): species barrier and sequence homology in prion transmission
+- Topic: prion-biology
+- Progress checkpoint logged.
+
