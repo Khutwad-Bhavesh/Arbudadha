@@ -36,3 +36,7 @@
 - Topic: prion-biology
 - Progress checkpoint logged.
 
+## 2026-10-14T13:45:00 - docs(study): summary of structural targets for 3d vector visualization
+- Topic: prion-biology
+- Progress checkpoint logged.
+
