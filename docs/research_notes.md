@@ -20,3 +20,7 @@
 - Topic: prion-biology
 - Progress checkpoint logged.
 
+## 2026-10-14T12:05:00 - docs(study): structured C-terminal globular domain overview (residues 125-231)
+- Topic: prion-biology
+- Progress checkpoint logged.
+
