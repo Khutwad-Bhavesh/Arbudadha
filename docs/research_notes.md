@@ -24,3 +24,7 @@
 - Topic: prion-biology
 - Progress checkpoint logged.
 
+## 2026-10-14T12:30:00 - docs(study): unstructured flexible N-terminal tail conformational plasticity
+- Topic: prion-biology
+- Progress checkpoint logged.
+
