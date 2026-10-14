@@ -32,3 +32,7 @@
 - Topic: prion-biology
 - Progress checkpoint logged.
 
+## 2026-10-14T13:20:00 - docs(study): oligomeric toxicity vs mature amyloid fibril stability
+- Topic: prion-biology
+- Progress checkpoint logged.
+
