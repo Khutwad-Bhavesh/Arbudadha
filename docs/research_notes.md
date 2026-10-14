@@ -12,3 +12,7 @@
 - Topic: prion-biology
 - Progress checkpoint logged.
 
+## 2026-10-14T11:15:00 - docs(study): spontaneous vs genetic vs acquired transmissible spongiform encephalopathies
+- Topic: prion-biology
+- Progress checkpoint logged.
+
