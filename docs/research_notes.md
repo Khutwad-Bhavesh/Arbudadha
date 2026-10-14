@@ -28,3 +28,7 @@
 - Topic: prion-biology
 - Progress checkpoint logged.
 
+## 2026-10-14T12:55:00 - docs(study): template-directed misfolding vs nucleation-polymerization model
+- Topic: prion-biology
+- Progress checkpoint logged.
+
