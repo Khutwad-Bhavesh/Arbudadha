@@ -16,3 +16,7 @@
 - Topic: prion-biology
 - Progress checkpoint logged.
 
+## 2026-10-14T11:40:00 - docs(study): octapeptide repeat region copper binding dynamics (residues 51-91)
+- Topic: prion-biology
+- Progress checkpoint logged.
+
