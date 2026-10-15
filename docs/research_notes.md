@@ -60,3 +60,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-15T12:05:00 - docs(format): handling missing or ambiguous residues with X code
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
