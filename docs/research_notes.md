@@ -68,3 +68,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-15T12:55:00 - docs(format): secondary structure annotation tags (ALPHA, BETA, GAMMA, COIL)
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
