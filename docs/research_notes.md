@@ -48,3 +48,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-15T10:50:00 - docs(format): single-letter IUPAC residue validation rules
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
