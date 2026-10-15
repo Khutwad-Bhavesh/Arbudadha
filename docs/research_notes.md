@@ -76,3 +76,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-15T13:45:00 - docs(format): comprehensive AAF v1.0 schema specification review
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
