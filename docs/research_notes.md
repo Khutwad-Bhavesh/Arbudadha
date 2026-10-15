@@ -56,3 +56,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-15T11:40:00 - docs(format): indexing conventions - 1-based residue coordinate system
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
