@@ -52,3 +52,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-15T11:15:00 - docs(format): whitespace tokenization vs fixed-width sequence blocks
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
