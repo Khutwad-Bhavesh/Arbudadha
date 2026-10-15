@@ -72,3 +72,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-15T13:20:00 - docs(format): probabilistic confidence score floats [0.00 - 1.00] integration
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
