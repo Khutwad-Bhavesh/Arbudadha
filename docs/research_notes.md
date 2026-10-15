@@ -64,3 +64,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-15T12:30:00 - docs(format): bond block grammar for covalent and coordinating interactions
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
