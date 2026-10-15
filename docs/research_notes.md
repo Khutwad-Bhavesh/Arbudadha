@@ -40,3 +40,7 @@
 - Topic: prion-biology
 - Progress checkpoint logged.
 
+## 2026-10-15T10:00:00 - docs(format): define magic line grammar AAF 1.0 specifications
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
