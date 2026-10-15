@@ -44,3 +44,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-15T10:25:00 - docs(format): header key-value metadata taxonomy (@chain, @organism, @type)
+- Topic: aaf-format-design
+- Progress checkpoint logged.
+
