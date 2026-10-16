@@ -104,3 +104,7 @@
 - Topic: sequence-tokenization
 - Progress checkpoint logged.
 
+## 2026-10-16T12:30:00 - docs(tokenizer): residue frequency analysis on human PrP sequence
+- Topic: sequence-tokenization
+- Progress checkpoint logged.
+
