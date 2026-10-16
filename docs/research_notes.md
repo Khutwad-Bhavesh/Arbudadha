@@ -88,3 +88,7 @@
 - Topic: sequence-tokenization
 - Progress checkpoint logged.
 
+## 2026-10-16T10:50:00 - docs(tokenizer): state machine transition triggers (HEADER, SEQ, BOND, HINT)
+- Topic: sequence-tokenization
+- Progress checkpoint logged.
+
