@@ -96,3 +96,7 @@
 - Topic: sequence-tokenization
 - Progress checkpoint logged.
 
+## 2026-10-16T11:40:00 - docs(tokenizer): length validation assertion against header metadata
+- Topic: sequence-tokenization
+- Progress checkpoint logged.
+
