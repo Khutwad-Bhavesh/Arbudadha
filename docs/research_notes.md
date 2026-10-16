@@ -80,3 +80,7 @@
 - Topic: aaf-format-design
 - Progress checkpoint logged.
 
+## 2026-10-16T10:00:00 - docs(tokenizer): line-by-line streaming vs in-memory full string parsing
+- Topic: sequence-tokenization
+- Progress checkpoint logged.
+
