@@ -100,3 +100,7 @@
 - Topic: sequence-tokenization
 - Progress checkpoint logged.
 
+## 2026-10-16T12:05:00 - docs(tokenizer): error handling and descriptive FormatError exception classes
+- Topic: sequence-tokenization
+- Progress checkpoint logged.
+
