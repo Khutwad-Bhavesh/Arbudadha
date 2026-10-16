@@ -84,3 +84,7 @@
 - Topic: sequence-tokenization
 - Progress checkpoint logged.
 
+## 2026-10-16T10:25:00 - docs(tokenizer): strip comments and trailing whitespace regex rules
+- Topic: sequence-tokenization
+- Progress checkpoint logged.
+
