@@ -108,3 +108,7 @@
 - Topic: sequence-tokenization
 - Progress checkpoint logged.
 
+## 2026-10-16T12:55:00 - docs(tokenizer): hydrophobic cluster identification in neurotoxic peptide 106-126
+- Topic: sequence-tokenization
+- Progress checkpoint logged.
+
