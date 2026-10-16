@@ -116,3 +116,7 @@
 - Topic: sequence-tokenization
 - Progress checkpoint logged.
 
+## 2026-10-16T13:45:00 - docs(tokenizer): benchmark tokenizer performance on high-length polypeptide chains
+- Topic: sequence-tokenization
+- Progress checkpoint logged.
+
