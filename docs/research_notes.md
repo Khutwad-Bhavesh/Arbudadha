@@ -132,3 +132,7 @@
 - Topic: covalent-bonds
 - Progress checkpoint logged.
 
+## 2026-10-17T11:15:00 - docs(bonds): regex pattern matching for residue-indexed bond notation
+- Topic: covalent-bonds
+- Progress checkpoint logged.
+
