@@ -120,3 +120,7 @@
 - Topic: sequence-tokenization
 - Progress checkpoint logged.
 
+## 2026-10-17T10:00:00 - docs(bonds): disulfide bridge chemistry and redox stability in PrP
+- Topic: covalent-bonds
+- Progress checkpoint logged.
+
