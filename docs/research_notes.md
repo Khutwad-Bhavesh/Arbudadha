@@ -144,3 +144,7 @@
 - Topic: covalent-bonds
 - Progress checkpoint logged.
 
+## 2026-10-17T12:30:00 - docs(bonds): distance constraint calculation for Three.js bond cylinders
+- Topic: covalent-bonds
+- Progress checkpoint logged.
+
