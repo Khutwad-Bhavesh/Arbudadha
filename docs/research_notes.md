@@ -148,3 +148,7 @@
 - Topic: covalent-bonds
 - Progress checkpoint logged.
 
+## 2026-10-17T12:55:00 - docs(bonds): salt bridges and charge-pairing interactions in PrP stability
+- Topic: covalent-bonds
+- Progress checkpoint logged.
+
