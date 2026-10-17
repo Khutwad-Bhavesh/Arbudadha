@@ -136,3 +136,7 @@
 - Topic: covalent-bonds
 - Progress checkpoint logged.
 
+## 2026-10-17T11:40:00 - docs(bonds): validating cysteine identity at specified residue indices
+- Topic: covalent-bonds
+- Progress checkpoint logged.
+
