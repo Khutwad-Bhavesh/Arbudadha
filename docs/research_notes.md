@@ -152,3 +152,7 @@
 - Topic: covalent-bonds
 - Progress checkpoint logged.
 
+## 2026-10-17T13:20:00 - docs(bonds): edge case handling: unpaired cysteines and free thiol groups
+- Topic: covalent-bonds
+- Progress checkpoint logged.
+
