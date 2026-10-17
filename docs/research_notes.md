@@ -128,3 +128,7 @@
 - Topic: covalent-bonds
 - Progress checkpoint logged.
 
+## 2026-10-17T10:50:00 - docs(bonds): intra-chain vs inter-chain crosslinking representation in AAF
+- Topic: covalent-bonds
+- Progress checkpoint logged.
+
