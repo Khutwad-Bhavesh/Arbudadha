@@ -124,3 +124,7 @@
 - Topic: covalent-bonds
 - Progress checkpoint logged.
 
+## 2026-10-17T10:25:00 - docs(bonds): human PrP Cys179-Cys214 disulfide bond structural constraint
+- Topic: covalent-bonds
+- Progress checkpoint logged.
+
