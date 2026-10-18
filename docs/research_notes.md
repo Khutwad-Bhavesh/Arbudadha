@@ -172,3 +172,7 @@
 - Topic: chou-fasman-theory
 - Progress checkpoint logged.
 
+## 2026-10-18T11:15:00 - docs(predictor): helix and sheet propagation rules and termination boundaries
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
