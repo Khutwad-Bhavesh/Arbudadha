@@ -164,3 +164,7 @@
 - Topic: chou-fasman-theory
 - Progress checkpoint logged.
 
+## 2026-10-18T10:25:00 - docs(predictor): helix nucleating hexapeptides criteria (P(a) >= 103 threshold)
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
