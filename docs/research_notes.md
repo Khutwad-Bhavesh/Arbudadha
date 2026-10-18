@@ -168,3 +168,7 @@
 - Topic: chou-fasman-theory
 - Progress checkpoint logged.
 
+## 2026-10-18T10:50:00 - docs(predictor): sheet nucleating pentapeptides criteria (P(b) >= 105 threshold)
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
