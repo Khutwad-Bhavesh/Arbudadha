@@ -160,3 +160,7 @@
 - Topic: covalent-bonds
 - Progress checkpoint logged.
 
+## 2026-10-18T10:00:00 - docs(predictor): Chou-Fasman conformational parameter tables P(a) and P(b)
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
