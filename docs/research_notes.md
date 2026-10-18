@@ -176,3 +176,7 @@
 - Topic: chou-fasman-theory
 - Progress checkpoint logged.
 
+## 2026-10-18T11:40:00 - docs(predictor): conformational conflict resolution when P(a) and P(b) compete
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
