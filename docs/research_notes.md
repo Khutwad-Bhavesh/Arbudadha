@@ -188,3 +188,7 @@
 - Topic: chou-fasman-theory
 - Progress checkpoint logged.
 
+## 2026-10-18T12:55:00 - docs(predictor): prion beta-sheet propensity elevation in codon 129 polymorphic variants
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
