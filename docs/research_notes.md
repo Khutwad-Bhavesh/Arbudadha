@@ -192,3 +192,7 @@
 - Topic: chou-fasman-theory
 - Progress checkpoint logged.
 
+## 2026-10-18T13:20:00 - docs(predictor): window-based moving average smoothing algorithm
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
