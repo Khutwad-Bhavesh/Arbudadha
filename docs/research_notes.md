@@ -196,3 +196,7 @@
 - Topic: chou-fasman-theory
 - Progress checkpoint logged.
 
+## 2026-10-18T13:45:00 - docs(predictor): output normalization to probabilistic confidence values [0.0 - 1.0]
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
