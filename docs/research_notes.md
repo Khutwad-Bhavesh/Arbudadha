@@ -180,3 +180,7 @@
 - Topic: chou-fasman-theory
 - Progress checkpoint logged.
 
+## 2026-10-18T12:05:00 - docs(predictor): gamma turn and beta hairpin prediction via tetrapeptide frequency
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
