@@ -184,3 +184,7 @@
 - Topic: chou-fasman-theory
 - Progress checkpoint logged.
 
+## 2026-10-18T12:30:00 - docs(predictor): proline and glycine helix-breaker penalties
+- Topic: chou-fasman-theory
+- Progress checkpoint logged.
+
