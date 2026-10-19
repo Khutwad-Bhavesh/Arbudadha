@@ -208,3 +208,7 @@
 - Topic: vector-geometry
 - Progress checkpoint logged.
 
+## 2026-10-19T10:50:00 - docs(math): 100-degree residue rotation and 1.5A axial rise per residue
+- Topic: vector-geometry
+- Progress checkpoint logged.
+
