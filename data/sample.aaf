@@ -1,0 +1,22 @@
+# Human Prion Protein (PrP) — Sample AAF File
+# AAF v1.0 | arbudadhā Project
+# Source: UniProt P04156 (PRIO_HUMAN), residues 23-253
+
+@chain A
+@organism human
+@type prion
+@name Human Prion Protein PrP
+@length 60
+
+SEQ:
+M K H M A G A A A A G A V V G G L G G Y M L G S A M S R P I
+I H F G S D Y E D R Y Y R E N M H R Y P N Q V Y Y R P V D Q
+
+HINT:
+1-6   COIL    # N-terminal unstructured region
+7-14  ALPHA   # Helix 1 (H1)
+15-22 BETA    # Beta strand S1 — critical in PrPSc conversion
+23-28 GAMMA   # Gamma turn connecting S1 to S2
+29-38 BETA    # Beta strand S2 — sheets form here in misfolded state
+39-50 ALPHA   # Helix 2 (H2) — large central helix in PrPc
+51-60 COIL    # C-terminal flexible loop
