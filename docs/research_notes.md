@@ -228,3 +228,7 @@
 - Topic: vector-geometry
 - Progress checkpoint logged.
 
+## 2026-10-19T12:55:00 - docs(math): random coil self-avoiding random walk generation with persistence length
+- Topic: vector-geometry
+- Progress checkpoint logged.
+
