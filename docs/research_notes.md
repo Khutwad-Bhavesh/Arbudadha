@@ -204,3 +204,7 @@
 - Topic: vector-geometry
 - Progress checkpoint logged.
 
+## 2026-10-19T10:25:00 - docs(math): right-handed alpha-helix parametric equations (r=2.3A, pitch=5.4A)
+- Topic: vector-geometry
+- Progress checkpoint logged.
+
