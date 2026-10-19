@@ -5,11 +5,12 @@
 
 ## Overview
 
-**AAF** (Amino Acid Format) is a plain-text, human-readable file format for representing protein amino acid chains with optional secondary structure annotations. It is designed to be:
+**AAF** (Amino Acid Format) is a plain-text, human-readable file format for representing protein amino acid chains with optional secondary structure annotations, bond data, and prediction confidence scores. It is designed to be:
 
 - **Simple** — readable without any tooling
 - **Universal** — works for any protein, not just prions
-- **Annotatable** — supports manual structure hints alongside raw sequence data
+- **Annotatable** — supports manual structure hints + predictor output confidence scores
+- **Bond-aware** — encodes disulfide and other covalent bonds affecting 3D shape
 - **Parseable** — strict grammar for reliable programmatic parsing
 
 File extension: `.aaf`
@@ -18,113 +19,219 @@ File extension: `.aaf`
 
 ## File Structure
 
-An `.aaf` file has three sections (in order):
+An `.aaf` file has five sections in this **strict order**:
 
 ```
-1. Header Block    (metadata, starts with @)
-2. Sequence Block  (raw amino acid chain, starts with SEQ:)
-3. Hint Block      (optional manual structure annotations, starts with HINT:)
+1. Magic Line     (version declaration — MANDATORY, must be first line)
+2. Header Block   (metadata, lines starting with @)
+3. Sequence Block (raw amino acid chain, starts with SEQ:)
+4. Bond Block     (optional covalent bonds, starts with BOND:)
+5. Hint Block     (optional structure annotations, starts with HINT:)
 ```
 
 ### Comments
 
-Lines starting with `#` are comments and are ignored by the parser.
+Lines starting with `#` are comments and are **ignored** by the parser.
+Comments may appear anywhere in the file.
 
 ---
 
-## 1. Header Block
+## 1. Magic Line
 
-Each header line starts with `@` followed by a key and value.
+**The first non-comment, non-empty line of every `.aaf` file MUST be:**
 
-| Key | Description | Example |
-|-----|-------------|---------|
-| `@chain` | Chain identifier (single letter) | `@chain A` |
-| `@organism` | Source organism | `@organism human` |
-| `@type` | Protein type/family | `@type prion` |
-| `@name` | Full protein name | `@name PrP Human` |
-| `@length` | Expected residue count | `@length 253` |
+```
+AAF 1.0
+```
+
+If this line is missing or malformed, the parser MUST throw a format error.
 
 ---
 
-## 2. Sequence Block
+## 2. Header Block
+
+Each header line starts with `@` followed by a key and value separated by a space.
+
+| Key | Required | Description | Example |
+|-----|----------|-------------|---------| 
+| `@chain` | ✅ Yes | Chain identifier (single letter A–Z) | `@chain A` |
+| `@name` | ✅ Yes | Full protein name | `@name Human Prion Protein PrP` |
+| `@organism` | ✅ Yes | Source organism | `@organism human` |
+| `@type` | ✅ Yes | Protein type/family | `@type prion` |
+| `@length` | ✅ Yes | Expected residue count (used for validation) | `@length 253` |
+
+---
+
+## 3. Sequence Block
 
 Begins with `SEQ:` on its own line.
 
-Amino acids are listed as **single-letter codes**, separated by spaces.
-Each line represents up to **30 residues**.
-Position indexing starts at **1**.
+### Rules
+- Amino acids are listed as **single-letter codes separated by single spaces**
+- Each line holds up to **30 residues**
+- Position indexing starts at **1**
+- Unknown or missing residues are encoded as **`X`**
+- Only valid codes (see table below) and `X` are accepted; invalid codes = parser error
 
-### Single-letter Amino Acid Codes
+### Single-Letter Amino Acid Code Table
 
-| Letter | Amino Acid | Letter | Amino Acid |
-|--------|-----------|--------|-----------|
-| A | Alanine | M | Methionine |
-| C | Cysteine | N | Asparagine |
-| D | Aspartate | P | Proline |
-| E | Glutamate | Q | Glutamine |
-| F | Phenylalanine | R | Arginine |
-| G | Glycine | S | Serine |
-| H | Histidine | T | Threonine |
-| I | Isoleucine | V | Valine |
-| K | Lysine | W | Tryptophan |
-| L | Leucine | Y | Tyrosine |
+| Code | Amino Acid    | Code | Amino Acid    |
+|------|---------------|------|---------------|
+| `A`  | Alanine       | `M`  | Methionine    |
+| `C`  | Cysteine      | `N`  | Asparagine    |
+| `D`  | Aspartate     | `P`  | Proline       |
+| `E`  | Glutamate     | `Q`  | Glutamine     |
+| `F`  | Phenylalanine | `R`  | Arginine      |
+| `G`  | Glycine       | `S`  | Serine        |
+| `H`  | Histidine     | `T`  | Threonine     |
+| `I`  | Isoleucine    | `V`  | Valine        |
+| `K`  | Lysine        | `W`  | Tryptophan    |
+| `L`  | Leucine       | `Y`  | Tyrosine      |
+| `X`  | **Unknown**   |      |               |
 
 ---
 
-## 3. Hint Block (Optional)
+## 4. Bond Block (Optional)
+
+Begins with `BOND:` on its own line.
+
+Encodes covalent bonds between specific residues that affect the 3D backbone geometry.
+
+### Format
+```
+<ResCode><pos>-<ResCode><pos>  <BOND_TYPE>   # optional comment
+```
+
+### Valid Bond Types
+
+| Tag | Meaning |
+|-----|---------|
+| `DISULFIDE` | Covalent S-S bond between two Cysteine (C) residues |
+| `PEPTIDE`   | Standard backbone peptide bond (implicit, rarely needs annotation) |
+| `OTHER`     | Any other non-standard bond |
+
+### Example
+```
+BOND:
+C179-C214  DISULFIDE   # critical stabilizing bond in PrP
+```
+
+### Rules
+- Both residues in a DISULFIDE bond MUST be `C` (Cysteine)
+- Positions refer to the 1-indexed residue number in the SEQ block
+- Parser MUST validate that positions are within `@length` range
+
+---
+
+## 5. Hint Block (Optional)
 
 Begins with `HINT:` on its own line.
 
-Manually annotate known secondary structure regions.
+Manually annotates known or predicted secondary structure regions.
+Can be written by a human expert **or** generated by the probabilistic predictor and written back into the file.
 
-### Format:
+### Format
 ```
-<start>-<end> <STRUCTURE>   # optional comment
+<start>-<end>  <STRUCTURE>  <confidence>   # optional comment
 ```
 
-### Valid Structure Tags:
-| Tag | Meaning |
-|-----|---------|
-| `ALPHA` | α-Helix |
-| `BETA` | β-Sheet |
-| `GAMMA` | γ-Turn |
-| `COIL` | Random Coil |
+- `<start>` and `<end>` — 1-indexed residue positions (inclusive range)
+- `<STRUCTURE>` — one of the valid structure tags (see below)
+- `<confidence>` — **optional** float between `0.00` and `1.00`
+  - If written by a human expert with certainty, omit or use `1.00`
+  - If written by the predictor, MUST include confidence score
+
+### Valid Structure Tags
+
+| Tag | Symbol | Meaning |
+|-----|--------|---------|
+| `ALPHA` | α | Alpha Helix — right-handed coil, 3.6 residues/turn |
+| `BETA`  | β | Beta Sheet — flat pleated strands, parallel/antiparallel |
+| `GAMMA` | γ | Gamma Turn — short 3–4 residue loop connecting strands |
+| `COIL`  | — | Random Coil — flexible, unstructured region |
+
+### Rules
+- Hint ranges MUST NOT overlap
+- Hint ranges MUST be within `@length` bounds
+- Residues not covered by any HINT are implicitly treated as `COIL`
 
 ---
 
 ## Full Example
 
 ```aaf
+AAF 1.0
+
 # Human Prion Protein (PrP) — partial sequence
-# AAF v1.0
+# Source: UniProt P04156 (PRIO_HUMAN)
 
 @chain A
+@name Human Prion Protein PrP
 @organism human
 @type prion
-@name Human Prion Protein PrP
 @length 30
 
 SEQ:
 M K H M A G A A A A G A V V G G L G G Y M L G S A M S R P I
 
+BOND:
+C3-C28  DISULFIDE   # stabilizing bond in this partial sequence
+
 HINT:
-1-5   COIL    # N-terminal flexible region
-6-12  ALPHA   # first helix
-13-20 BETA    # potential beta strand (danger zone in PrPSc)
-21-30 COIL    # unstructured tail
+1-5   COIL  1.00   # N-terminal flexible region (expert annotated)
+6-12  ALPHA 0.87   # Helix H1 (predictor confidence: 87%)
+13-20 BETA  0.94   # Beta strand S1 — danger zone in PrPSc conversion
+21-24 GAMMA 0.78   # Gamma turn connecting S1 to S2
+25-30 COIL  1.00   # C-terminal unstructured tail
 ```
 
 ---
 
-## Parser Rules
+## Parser Rules (Implementation Contract)
 
-1. Lines starting with `#` → skip
-2. Lines starting with `@` → parse as header key-value
-3. Line exactly `SEQ:` → switch to sequence parsing mode
-4. Line exactly `HINT:` → switch to hint parsing mode
-5. In SEQ mode: split line by spaces, each token is a residue code
-6. In HINT mode: parse `<int>-<int> <TAG>` pattern, ignore trailing comments
+| Step | Rule |
+|------|------|
+| 1 | Read first non-empty, non-comment line — MUST equal `AAF 1.0` or throw `FormatError` |
+| 2 | Lines starting with `#` → skip entirely |
+| 3 | Lines starting with `@` → parse as `key = value` (split on first space) |
+| 4 | Line `SEQ:` exactly → enter **sequence mode** |
+| 5 | In sequence mode: split each line by spaces → validate each token against code table |
+| 6 | Line `BOND:` exactly → enter **bond mode** |
+| 7 | In bond mode: parse `<Code><pos>-<Code><pos> <TYPE>` → validate positions + residue codes |
+| 8 | Line `HINT:` exactly → enter **hint mode** |
+| 9 | In hint mode: parse `<int>-<int> <TAG> [<float>]` → strip trailing `#` comments |
+| 10 | After full parse: validate `actual residue count == @length` or throw `LengthMismatchError` |
+
+---
+
+## Output Contract (Parser → Predictor → Visualizer)
+
+The parser must produce this JavaScript object:
+
+```js
+{
+  version: "1.0",
+  chain: "A",
+  name: "Human Prion Protein PrP",
+  organism: "human",
+  type: "prion",
+  length: 30,
+  residues: [
+    { index: 1, code: "M", structure: "COIL",  confidence: 1.00 },
+    { index: 2, code: "K", structure: "COIL",  confidence: 1.00 },
+    { index: 6, code: "A", structure: "ALPHA", confidence: 0.87 },
+    // ... one object per residue
+  ],
+  bonds: [
+    { from: 3, to: 28, type: "DISULFIDE" }
+  ]
+}
+```
+
+> [!NOTE]
+> The `residues` array is flat — **one object per amino acid** — with structure and confidence already resolved from HINT ranges. This makes the predictor and visualizer simple: they just iterate over this array.
 
 ---
 
 *Specification version 1.0 — arbudadhā project*
+*Designed for the arbudadhā Prion Protein 3D Visualizer*
