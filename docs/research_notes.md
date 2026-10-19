@@ -224,3 +224,7 @@
 - Topic: vector-geometry
 - Progress checkpoint logged.
 
+## 2026-10-19T12:30:00 - docs(math): gamma-turn arc interpolation using Hermite spline curves
+- Topic: vector-geometry
+- Progress checkpoint logged.
+
