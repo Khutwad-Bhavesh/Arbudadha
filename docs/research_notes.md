@@ -248,3 +248,7 @@
 - Topic: threejs-architecture
 - Progress checkpoint logged.
 
+## 2026-10-20T10:50:00 - docs(engine): single draw-call backbone ribbon with BufferGeometry
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
