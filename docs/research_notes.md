@@ -276,3 +276,7 @@
 - Topic: threejs-architecture
 - Progress checkpoint logged.
 
+## 2026-10-20T13:45:00 - docs(engine): final pipeline blueprint: .aaf -> parser -> predictor -> 3D scene
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
