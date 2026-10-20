@@ -240,3 +240,7 @@
 - Topic: vector-geometry
 - Progress checkpoint logged.
 
+## 2026-10-20T10:00:00 - docs(engine): Three.js low-spec target performance budget (60 FPS on integrated GPU)
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
