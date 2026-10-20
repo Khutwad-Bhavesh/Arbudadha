@@ -260,3 +260,7 @@
 - Topic: threejs-architecture
 - Progress checkpoint logged.
 
+## 2026-10-20T12:05:00 - docs(engine): depth sorting and vertex shader transparency optimizations
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
