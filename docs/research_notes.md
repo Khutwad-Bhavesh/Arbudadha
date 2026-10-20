@@ -252,3 +252,7 @@
 - Topic: threejs-architecture
 - Progress checkpoint logged.
 
+## 2026-10-20T11:15:00 - docs(engine): color palette tokens: alpha-blue, beta-yellow, gamma-green, coil-grey
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
