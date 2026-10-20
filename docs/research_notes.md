@@ -264,3 +264,7 @@
 - Topic: threejs-architecture
 - Progress checkpoint logged.
 
+## 2026-10-20T12:30:00 - docs(engine): interactive raycasting for residue inspection and tooltips
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
