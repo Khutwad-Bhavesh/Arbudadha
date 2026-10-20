@@ -268,3 +268,7 @@
 - Topic: threejs-architecture
 - Progress checkpoint logged.
 
+## 2026-10-20T12:55:00 - docs(engine): directional lighting and ambient occlusion approximation
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
