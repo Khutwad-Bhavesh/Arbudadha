@@ -244,3 +244,7 @@
 - Topic: threejs-architecture
 - Progress checkpoint logged.
 
+## 2026-10-20T10:25:00 - docs(engine): THREE.Points vs THREE.InstancedMesh memory footprint comparison
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
