@@ -272,3 +272,7 @@
 - Topic: threejs-architecture
 - Progress checkpoint logged.
 
+## 2026-10-20T13:20:00 - docs(engine): UI HUD layout integration for secondary structure statistics
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
