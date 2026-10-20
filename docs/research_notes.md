@@ -256,3 +256,7 @@
 - Topic: threejs-architecture
 - Progress checkpoint logged.
 
+## 2026-10-20T11:40:00 - docs(engine): orbit controls and responsive viewport resize handlers
+- Topic: threejs-architecture
+- Progress checkpoint logged.
+
