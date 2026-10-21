@@ -1,3 +1,5 @@
+// || श्री ||
+
 /**
  * AAFParser — Universal Amino Acid Format Parser v1.0
  * arbudadhā Project — Prion Protein Secondary Structure Visualizer
@@ -195,12 +197,148 @@ class AAFParser {
   }
 }
 
+class PDBParser {
+  static AA3_TO_AA1 = {
+    ALA: 'A', CYS: 'C', ASP: 'D', GLU: 'E', PHE: 'F',
+    GLY: 'G', HIS: 'H', ILE: 'I', LYS: 'K', LEU: 'L',
+    MET: 'M', ASN: 'N', PRO: 'P', GLN: 'Q', ARG: 'R',
+    SER: 'S', THR: 'T', VAL: 'V', TRP: 'W', TYR: 'Y'
+  };
+
+  /**
+   * Parse real PDB text, extracting C-alpha (CA) coordinates, HELIX, SHEET, and SSBOND records
+   * @param {string} pdbText
+   * @returns {Object} Normalized protein model
+   */
+  static parse(pdbText) {
+    if (!pdbText || typeof pdbText !== 'string') {
+      throw new Error('PDBError: PDB content must be a non-empty string');
+    }
+
+    const lines = pdbText.split(/\r?\n/);
+    const rawCAs = [];
+    const helixRanges = [];
+    const sheetRanges = [];
+    const bonds = [];
+    let title = 'PDB Protein';
+    let chainId = 'A';
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+
+      if (line.startsWith('TITLE')) {
+        title = line.substring(10).trim();
+      } else if (line.startsWith('HELIX')) {
+        // HELIX record: start res (21-25), end res (33-37)
+        const start = parseInt(line.substring(21, 25).trim(), 10);
+        const end = parseInt(line.substring(33, 37).trim(), 10);
+        if (!isNaN(start) && !isNaN(end)) {
+          helixRanges.push({ start, end });
+        }
+      } else if (line.startsWith('SHEET')) {
+        // SHEET record: start res (22-26), end res (33-37)
+        const start = parseInt(line.substring(22, 26).trim(), 10);
+        const end = parseInt(line.substring(33, 37).trim(), 10);
+        if (!isNaN(start) && !isNaN(end)) {
+          sheetRanges.push({ start, end });
+        }
+      } else if (line.startsWith('SSBOND')) {
+        // SSBOND: res1 (17-21), res2 (31-35)
+        const pos1 = parseInt(line.substring(17, 21).trim(), 10);
+        const pos2 = parseInt(line.substring(31, 35).trim(), 10);
+        if (!isNaN(pos1) && !isNaN(pos2)) {
+          bonds.push({
+            from: pos1,
+            to: pos2,
+            fromRes: 'C',
+            toRes: 'C',
+            type: 'DISULFIDE'
+          });
+        }
+      } else if (line.startsWith('ATOM') || line.startsWith('HETATM')) {
+        const atomName = line.substring(12, 16).trim();
+        if (atomName === 'CA') {
+          const res3 = line.substring(17, 20).trim();
+          const lineChain = line.substring(21, 22).trim() || 'A';
+          const resSeq = parseInt(line.substring(22, 26).trim(), 10);
+          const x = parseFloat(line.substring(30, 38).trim());
+          const y = parseFloat(line.substring(38, 46).trim());
+          const z = parseFloat(line.substring(46, 54).trim());
+
+          chainId = lineChain;
+          const code = this.AA3_TO_AA1[res3] || 'X';
+
+          rawCAs.push({
+            origSeq: resSeq,
+            code,
+            x,
+            y,
+            z
+          });
+        }
+      }
+    }
+
+    if (rawCAs.length === 0) {
+      throw new Error('PDBError: No C-alpha (CA) atoms found in provided PDB text');
+    }
+
+    // Remap to 1-based sequential indices while mapping secondary structures
+    const residues = rawCAs.map((ca, idx) => {
+      const index = idx + 1;
+      let structure = 'COIL';
+
+      const inHelix = helixRanges.some(h => ca.origSeq >= h.start && ca.origSeq <= h.end);
+      const inSheet = sheetRanges.some(s => ca.origSeq >= s.start && ca.origSeq <= s.end);
+
+      if (inHelix) structure = 'ALPHA';
+      else if (inSheet) structure = 'BETA';
+
+      return {
+        index,
+        code: ca.code,
+        origSeq: ca.origSeq,
+        structure,
+        confidence: 1.0,
+        experimentalCoords: { x: ca.x, y: ca.y, z: ca.z }
+      };
+    });
+
+    // Remap bonds to the sequential 1-based indices if needed
+    const mappedBonds = bonds.map(b => {
+      const idx1 = residues.findIndex(r => r.origSeq === b.from);
+      const idx2 = residues.findIndex(r => r.origSeq === b.to);
+      return {
+        from: idx1 !== -1 ? idx1 + 1 : b.from,
+        to: idx2 !== -1 ? idx2 + 1 : b.to,
+        fromRes: b.fromRes,
+        toRes: b.toRes,
+        type: b.type
+      };
+    });
+
+    return {
+      version: '1.0',
+      chain: chainId,
+      name: title,
+      organism: 'experimental (PDB)',
+      type: 'prion',
+      length: residues.length,
+      residues,
+      bonds: mappedBonds,
+      isExperimentalPDB: true
+    };
+  }
+}
+
 // Module export for Node.js test suites
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { AAFParser };
+  module.exports = { AAFParser, PDBParser };
 }
 
 // Browser export
 if (typeof window !== 'undefined') {
   window.AAFParser = AAFParser;
+  window.PDBParser = PDBParser;
 }
+
