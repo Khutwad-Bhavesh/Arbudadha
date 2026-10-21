@@ -52,6 +52,12 @@ function runTests() {
   assert(samplePrediction.betaClusters.length > 0, "Identified beta-sheet clusters in Human PrP core");
   assert(samplePrediction.prionRisk.score > 0, "Generated non-zero Prion Risk Score");
 
+  // Test 5: Hydropathy & Dual-Track Aggregation Hotspots
+  assert(valResult.predictions[0].hydrophobicity >= 4.0, "Poly-Valine has high Kyte-Doolittle hydrophobicity >= 4.0");
+  assert(typeof valResult.predictions[0].margin === 'number', "Prediction includes confidence margin");
+  assert(valResult.predictions.some(p => p.isDualTrackHotspot), "Dual-track validates Poly-Valine as amyloid hotspot");
+  assert(samplePrediction.predictions.some(p => p.isDualTrackHotspot), "Detected dual-track steric-zipper hotspot in Human PrP");
+
   console.log(`\nResults: ${passed}/${total} predictor tests passed.`);
   if (passed === total) {
     console.log('🏆 ChouFasmanPredictor verified! SIUUU! 🐐');

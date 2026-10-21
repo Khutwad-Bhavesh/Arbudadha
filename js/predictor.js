@@ -34,8 +34,17 @@ class ChouFasmanPredictor {
     X: { pa: 100, pb: 100, pturn: 100 }  // Ambiguous residue
   };
 
+  // Kyte-Doolittle Hydrophobicity Scale (Hydropathy index from -4.5 to +4.5)
+  static KYTE_DOOLITTLE = {
+    I: 4.5, V: 4.2, L: 3.8, F: 2.8, C: 2.5,
+    M: 1.9, A: 1.8, G: -0.4, T: -0.7, S: -0.8,
+    W: -0.9, Y: -1.3, P: -1.6, H: -3.2, E: -3.5,
+    Q: -3.5, D: -3.5, N: -3.5, K: -3.9, R: -4.5,
+    X: 0.0
+  };
+
   /**
-   * Predict secondary structure profile for a sequence of residues
+   * Predict secondary structure profile and dual-track aggregation for a sequence of residues
    * @param {Array<{index: number, code: string}>|string} sequence
    * @param {Object} [options]
    * @param {number} [options.windowSize=5]
@@ -58,10 +67,11 @@ class ChouFasmanPredictor {
       throw new Error('PredictorError: Sequence must not be empty');
     }
 
-    // Step 1: Extract individual propensities
+    // Step 1: Extract individual propensities and hydropathy
     const rawScores = residueCodes.map(code => {
       const prop = this.PROPENSITIES[code] || this.PROPENSITIES.X;
-      return { pa: prop.pa, pb: prop.pb, pturn: prop.pturn };
+      const hydro = this.KYTE_DOOLITTLE[code] !== undefined ? this.KYTE_DOOLITTLE[code] : 0.0;
+      return { pa: prop.pa, pb: prop.pb, pturn: prop.pturn, hydro };
     });
 
     // Step 2: Calculate smoothed sliding window averages
@@ -70,6 +80,7 @@ class ChouFasmanPredictor {
       let sumPa = 0;
       let sumPb = 0;
       let sumPt = 0;
+      let sumHydro = 0;
       let count = 0;
 
       for (let w = -halfWindow; w <= halfWindow; w++) {
@@ -78,6 +89,7 @@ class ChouFasmanPredictor {
           sumPa += rawScores[idx].pa;
           sumPb += rawScores[idx].pb;
           sumPt += rawScores[idx].pturn;
+          sumHydro += rawScores[idx].hydro;
           count++;
         }
       }
@@ -85,11 +97,12 @@ class ChouFasmanPredictor {
       smoothed.push({
         avgPa: sumPa / count,
         avgPb: sumPb / count,
-        avgPt: sumPt / count
+        avgPt: sumPt / count,
+        avgHydro: sumHydro / count
       });
     }
 
-    // Step 3: Determine structure state and confidence score
+    // Step 3: Determine structure state, confidence margin, and dual-track agreement
     const predictions = [];
     let alphaCount = 0;
     let betaCount = 0;
@@ -97,15 +110,16 @@ class ChouFasmanPredictor {
     let coilCount = 0;
 
     for (let i = 0; i < n; i++) {
-      const { avgPa, avgPb, avgPt } = smoothed[i];
+      const { avgPa, avgPb, avgPt, avgHydro } = smoothed[i];
       const code = residueCodes[i];
 
       let structure = 'COIL';
       let confidence = 0.50;
 
       // Decision boundaries
-      const maxScore = Math.max(avgPa, avgPb, avgPt);
       const totalScore = avgPa + avgPb + avgPt;
+      const sortedProps = [avgPa, avgPb, avgPt].sort((a, b) => b - a);
+      const margin = parseFloat((sortedProps[0] - sortedProps[1]).toFixed(1));
 
       if (avgPb >= 105 && avgPb > avgPa) {
         structure = 'BETA';
@@ -117,7 +131,7 @@ class ChouFasmanPredictor {
         alphaCount++;
       } else if (avgPt >= 115 && avgPt > avgPa && avgPt > avgPb) {
         structure = 'GAMMA';
-        confidence = Math.min(0.95, Math.max(0.50, avgPt / totalScore * 2.5));
+        confidence = Math.min(0.95, Math.max(0.50, (avgPt / totalScore) * 2.5));
         gammaCount++;
       } else {
         structure = 'COIL';
@@ -125,11 +139,19 @@ class ChouFasmanPredictor {
         coilCount++;
       }
 
+      // Dual-track evaluation: Is this residue both Beta-prone and Hydrophobic?
+      // (Steric-zipper nucleation characteristic)
+      const isHydrophobic = avgHydro >= 1.0;
+      const isDualTrackHotspot = structure === 'BETA' && isHydrophobic;
+
       predictions.push({
         index: i + 1,
         code,
         structure,
         confidence: parseFloat(confidence.toFixed(2)),
+        margin,
+        hydrophobicity: parseFloat(avgHydro.toFixed(2)),
+        isDualTrackHotspot,
         scores: {
           pa: Math.round(avgPa),
           pb: Math.round(avgPb),
