@@ -243,6 +243,24 @@ class PrionVisualizer3D {
   }
 
   /**
+   * Reset camera position and target to default bounding view
+   */
+  resetCamera() {
+    if (!this.backboneLine || !this.camera) return;
+    this.backboneLine.geometry.computeBoundingSphere();
+    const sphere = this.backboneLine.geometry.boundingSphere;
+    if (sphere) {
+      const dist = sphere.radius * 2.8;
+      this.camera.position.set(0, dist * 0.4, dist);
+      this.camera.lookAt(0, 0, 0);
+      if (this.controls) {
+        this.controls.target.set(0, 0, 0);
+        this.controls.update();
+      }
+    }
+  }
+
+  /**
    * Render protein model with 3D points, continuous backbone line, and disulfide bridges
    */
   renderProtein(proteinModel) {

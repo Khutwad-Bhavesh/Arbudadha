@@ -492,6 +492,23 @@ END`
     a.click();
   }
 
+  // Keyboard Shortcuts: 1, 2, 3 for modes, R for camera reset
+  window.addEventListener('keydown', (e) => {
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
+    if (e.key === '1') {
+      const p = document.getElementById('btnModeStructure');
+      if (p) p.click();
+    } else if (e.key === '2') {
+      const p = document.getElementById('btnModeRisk');
+      if (p) p.click();
+    } else if (e.key === '3') {
+      const p = document.getElementById('btnModeHydro');
+      if (p) p.click();
+    } else if (e.key === 'r' || e.key === 'R') {
+      visualizer.resetCamera();
+    }
+  });
+
   // Auto-load human sample on initial startup
   if (btnLoadSample) {
     btnLoadSample.click();
