@@ -11,6 +11,7 @@
   --color-gamma: #22c55e;   /* Emerald Green */
   --color-coil: #94a3b8;    /* Slate Grey */
   --color-cyan: #06b6d4;    /* Cyan */
+  --color-hotspot: #f43f5e; /* Crimson Hotspot */
   --color-danger: #ef4444;  /* Red */
 }
 
@@ -30,7 +31,7 @@ body {
 }
 
 .container {
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
@@ -60,11 +61,11 @@ header {
 
 .main-layout {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 440px 1fr;
   gap: 1.5rem;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   .main-layout {
     grid-template-columns: 1fr;
   }
@@ -80,7 +81,7 @@ header {
 }
 
 .card h2 {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text-main);
   margin-bottom: 0.75rem;
@@ -91,13 +92,13 @@ header {
 
 textarea {
   width: 100%;
-  height: 180px;
+  height: 160px;
   background: #050814;
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   color: #38bdf8;
   font-family: 'JetBrains Mono', monospace, Consolas;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   padding: 0.75rem;
   resize: vertical;
 }
@@ -109,25 +110,29 @@ textarea:focus {
 
 .btn-group {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
 }
 
 button {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #fff;
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  border-radius: 6px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
 }
 
 button.btn-secondary {
@@ -136,8 +141,32 @@ button.btn-secondary {
 }
 
 button.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
   box-shadow: none;
+}
+
+/* Preset & Mutation Selectors */
+.select-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+select {
+  width: 100%;
+  background: #050814;
+  border: 1px solid var(--border-subtle);
+  color: #e2e8f0;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+select:focus {
+  outline: none;
+  border-color: #38bdf8;
 }
 
 /* Statistics & Risk Dashboard */
@@ -145,12 +174,12 @@ button.btn-secondary:hover {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 0.8rem;
 }
 
 .stat-item {
   background: rgba(0, 0, 0, 0.3);
-  padding: 0.6rem;
+  padding: 0.5rem;
   border-radius: 6px;
   text-align: center;
   border-left: 3px solid #64748b;
@@ -162,20 +191,20 @@ button.btn-secondary:hover {
 .stat-item.coil { border-left-color: var(--color-coil); }
 
 .stat-val {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
 }
 
 .stat-lbl {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--text-muted);
   text-transform: uppercase;
 }
 
 /* Risk Meter Card */
 .risk-box {
-  margin-top: 1rem;
-  padding: 0.85rem;
+  margin-top: 0.8rem;
+  padding: 0.75rem;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid var(--border-subtle);
@@ -185,14 +214,14 @@ button.btn-secondary:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
-  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.3rem;
 }
 
 .risk-badge {
-  padding: 0.2rem 0.6rem;
+  padding: 0.2rem 0.5rem;
   border-radius: 9999px;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -206,7 +235,7 @@ button.btn-secondary:hover {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 9999px;
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .risk-bar-fill {
@@ -217,31 +246,135 @@ button.btn-secondary:hover {
 }
 
 .risk-desc {
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
-/* 3D Viewport */
+/* 3D Viewport & Overlay Controls */
 .viewport-card {
   position: relative;
   display: flex;
   flex-direction: column;
 }
 
+.viewport-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.mode-pill-group {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.mode-pill {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-pill:hover {
+  color: #fff;
+  transform: none;
+  box-shadow: none;
+}
+
+.mode-pill.active {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
 #viewport3D {
   width: 100%;
-  height: 580px;
+  height: 520px;
   border-radius: 8px;
   overflow: hidden;
   position: relative;
+  background: #050814;
 }
 
+/* Sequence Strip (3D Linked) */
+.sequence-strip-container {
+  margin-top: 0.8rem;
+}
+
+.sequence-strip-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.sequence-strip {
+  display: flex;
+  overflow-x: auto;
+  gap: 3px;
+  padding: 6px 4px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  scrollbar-width: thin;
+}
+
+.residue-chip {
+  flex: 0 0 28px;
+  height: 38px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+  background: #1e293b;
+  border-bottom: 3px solid #64748b;
+}
+
+.residue-chip:hover, .residue-chip.active {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+  border-color: #fff !important;
+}
+
+.residue-chip .sub-idx {
+  font-size: 0.58rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.residue-chip.chip-alpha { border-bottom-color: var(--color-alpha); background: rgba(59, 130, 246, 0.2); }
+.residue-chip.chip-beta { border-bottom-color: var(--color-beta); background: rgba(234, 179, 8, 0.2); }
+.residue-chip.chip-gamma { border-bottom-color: var(--color-gamma); background: rgba(34, 197, 94, 0.2); }
+.residue-chip.chip-coil { border-bottom-color: var(--color-coil); background: rgba(148, 163, 184, 0.15); }
+.residue-chip.chip-hotspot { border-bottom-color: var(--color-hotspot); background: rgba(244, 63, 94, 0.35); }
+
+/* Legend Bar */
 .legend-bar {
   display: flex;
-  gap: 1.25rem;
-  margin-top: 0.75rem;
-  font-size: 0.8rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.6rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   align-items: center;
 }
@@ -249,12 +382,12 @@ button.btn-secondary:hover {
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
 }
 
 .legend-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
 }
 
@@ -263,20 +396,46 @@ button.btn-secondary:hover {
 .legend-dot.gamma { background: var(--color-gamma); }
 .legend-dot.coil { background: var(--color-coil); }
 .legend-dot.bond { background: var(--color-cyan); }
+.legend-dot.hotspot { background: var(--color-hotspot); }
+
+/* Export Toolbar */
+.export-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+/* Scientific Limitations / Disclaimer Banner */
+.disclaimer-card {
+  margin-top: 1.5rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.78rem;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+.disclaimer-card strong {
+  color: #38bdf8;
+}
 
 /* Tooltip for 3D residue inspection */
 #residueTooltip {
   position: fixed;
   pointer-events: none;
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(15, 23, 42, 0.95);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 6px;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.8rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.78rem;
   color: #fff;
   z-index: 1000;
   display: none;
   transform: translate(-50%, -120%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+  line-height: 1.4;
 }

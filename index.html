@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="arbudadhā (अर्बुदधा) — 3D Vector Chain Prion Protein Secondary Structure Visualizer">
-  <title>arbudadhā (अर्बुदधा) 🧬 Prion Structure Visualizer</title>
+  <meta name="description" content="arbudadhā (अर्बुदधा) — Research-Grade 3D Vector Chain Prion Protein Visualizer & Dual-Track Amyloid Predictor">
+  <title>arbudadhā (अर्बुदधा) 🧬 Prion Structure & Amyloid Predictor</title>
   <link rel="stylesheet" href="./css/styles.css">
   <!-- Three.js + OrbitControls -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -16,10 +16,10 @@
     <header>
       <div class="title-group">
         <h1>🧬 arbudadhā — अर्बुदधा</h1>
-        <p>3D Vector-Point Backbone Chain Visualizer & Probabilistic Prion Beta-Sheet Predictor</p>
+        <p>Research-Grade 3D Vector-Point Chain Visualizer & Dual-Track Amyloid Hotspot Predictor</p>
       </div>
       <div style="font-size: 0.85rem; color: #94a3b8; text-align: right;">
-        <span style="color: #38bdf8; font-weight: 700;">AAF v1.0 Spec</span> &bull; 60 FPS Low-Spec Optimized
+        <span style="color: #38bdf8; font-weight: 700;">AAF v1.0 & PDB Cα</span> &bull; 60 FPS Low-Spec Native
       </div>
     </header>
 
@@ -27,17 +27,43 @@
       <!-- Left Column: Controls & Analytics -->
       <div class="control-panel">
         <div class="card">
-          <h2>📄 AAF File Import</h2>
-          <textarea id="aafInput" aria-label="AAF File Input" placeholder="Paste .aaf content here or click Load Sample PrP..."></textarea>
+          <h2>📄 AAF / PDB Sequence Import</h2>
+          <textarea id="aafInput" aria-label="Sequence Input" placeholder="Paste .aaf or .pdb format here, or select a preset below..."></textarea>
           
           <div class="btn-group">
             <button id="btnParse">Render Chain</button>
-            <button id="btnPredict" style="background: linear-gradient(135deg, #eab308, #ca8a04);">⚡ Predict β-Sheets</button>
-            <button id="btnLoadSample" class="btn-secondary">Load PrP</button>
+            <button id="btnPredict" style="background: linear-gradient(135deg, #eab308, #ca8a04);">⚡ Predict Hotspots</button>
+            <button id="btnLoadSample" class="btn-secondary">Load Human PrP</button>
+          </div>
+
+          <!-- Presets & Mutation Simulators -->
+          <div class="select-row">
+            <div>
+              <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 0.2rem;">SPECIES PRESETS</label>
+              <select id="selSpecies">
+                <option value="">Select Species...</option>
+                <option value="human">Human PrP (UniProt P04156)</option>
+                <option value="bovine">Bovine PrP (Mad Cow / BSE)</option>
+                <option value="hamster">Syrian Hamster PrP (Lab Model)</option>
+                <option value="mouse">Mouse PrP (Rodent Model)</option>
+                <option value="pdb_1qlx">PDB 1QLX (Human PrP NMR Cα)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 0.2rem;">MUTATION SIMULATOR</label>
+              <select id="selMutation">
+                <option value="">Simulate Variant...</option>
+                <option value="P102L">P102L (GSS Disease)</option>
+                <option value="D178N">D178N (Fatal Familial Insomnia)</option>
+                <option value="E200K">E200K (Familial CJD)</option>
+                <option value="M129V">M129V (vCJD Resistance)</option>
+                <option value="G127V">G127V (Kuru Immunity Variant)</option>
+              </select>
+            </div>
           </div>
 
           <!-- Secondary Structure Statistics -->
-          <h2 style="margin-top: 1.25rem;">📊 Secondary Structure Content</h2>
+          <h2 style="margin-top: 1.1rem;">📊 Secondary Structure Content</h2>
           <div class="stat-grid">
             <div class="stat-item alpha">
               <div class="stat-val" id="statAlpha" style="color: var(--color-alpha);">0%</div>
@@ -60,28 +86,50 @@
           <!-- Prion Risk Analysis -->
           <div class="risk-box">
             <div class="risk-header">
-              <strong>Prion Amyloid Risk Score</strong>
+              <strong>Dual-Track Amyloid Risk</strong>
               <span id="riskBadge" class="risk-badge LOW">LOW</span>
             </div>
-            <div style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.3rem;" id="riskScoreVal">0 / 100</div>
+            <div style="font-size: 1.25rem; font-weight: 800; margin-bottom: 0.2rem;" id="riskScoreVal">0 / 100</div>
             <div class="risk-bar-container">
               <div class="risk-bar-fill" id="riskBarFill"></div>
             </div>
             <div class="risk-desc" id="riskDesc">
-              Load and parse a protein sequence to compute misfolding susceptibility.
+              Parse sequence to calculate Chou-Fasman + Kyte-Doolittle steric-zipper consensus.
             </div>
+          </div>
+
+          <!-- Research Export Suite -->
+          <h2 style="margin-top: 1.1rem;">💾 Research Data Exports</h2>
+          <div class="export-toolbar">
+            <button id="btnExportCSV" class="btn-secondary">📥 Export CSV</button>
+            <button id="btnExportJSON" class="btn-secondary">📦 Export JSON</button>
+            <button id="btnExportAAF" class="btn-secondary">📄 Save .AAF</button>
+            <button id="btnExportPNG" class="btn-secondary">📸 Snapshot PNG</button>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: 3D Viewport -->
+      <!-- Right Column: 3D Viewport & Sequence Strip -->
       <div class="viewport-card card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="viewport-toolbar">
           <h2>🌀 3D Vector Backbone Chain</h2>
-          <span style="font-size: 0.75rem; color: #94a3b8;">🖱️ Left-Click: Rotate &bull; Right-Click: Pan &bull; Scroll: Zoom</span>
+          <div class="mode-pill-group">
+            <button class="mode-pill active" id="btnModeStructure" data-mode="STRUCTURE">Conformation</button>
+            <button class="mode-pill" id="btnModeRisk" data-mode="RISK">🔥 Aggregation Heatmap</button>
+            <button class="mode-pill" id="btnModeHydro" data-mode="HYDROPATHY">💧 Hydropathy</button>
+          </div>
         </div>
         
         <div id="viewport3D"></div>
+
+        <!-- Linked Sequence Strip -->
+        <div class="sequence-strip-container">
+          <div class="sequence-strip-label">
+            <span>RESIDUE SEQUENCE STRIP (CLICK / HOVER TO LOCATE IN 3D)</span>
+            <span id="stripCountLabel">0 Residues</span>
+          </div>
+          <div id="sequenceStrip" class="sequence-strip"></div>
+        </div>
 
         <div class="legend-bar">
           <div class="legend-item"><div class="legend-dot alpha"></div> α-Helix</div>
@@ -89,8 +137,17 @@
           <div class="legend-item"><div class="legend-dot gamma"></div> γ-Turn</div>
           <div class="legend-item"><div class="legend-dot coil"></div> Random Coil</div>
           <div class="legend-item"><div class="legend-dot bond"></div> Disulfide Bridge (S-S)</div>
+          <div class="legend-item"><div class="legend-dot hotspot"></div> Dual-Track Steric Zipper</div>
         </div>
       </div>
+    </div>
+
+    <!-- Scientific Methodology & Limitations Banner -->
+    <div class="disclaimer-card">
+      <strong>⚠️ Research Methodology & Limitations:</strong> arbudadhā employs a hybrid model combining the classical 
+      <em>Chou-Fasman statistical mechanics</em> with <em>Kyte-Doolittle hydropathy profiling</em> to screen for steric-zipper amyloid nucleation patches in real-time ($O(N)$ complexity). 
+      The 3D coordinates represent an idealized continuous C-alpha backbone trace and experimental PDB C-alpha coordinates. This tool serves as an exploratory heuristic screener; 
+      definitive conformational transitions should be corroborated with atomic-resolution all-atom molecular dynamics (GROMACS/AMBER) or cryo-EM density maps.
     </div>
   </div>
 
