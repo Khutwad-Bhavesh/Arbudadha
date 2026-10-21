@@ -1,14 +1,15 @@
 // || श्री ||
 
 /**
- * PrionVisualizer3D — Lightweight Vector-Point & Backbone 3D Renderer
+ * PrionVisualizer3D — Research-Grade Vector-Point & Backbone 3D Renderer
  * arbudadhā Project — Prion Protein Secondary Structure Visualizer
  *
  * Designed for ultra-high performance on limited-spec hardware:
- * - C-alpha backbone trace using parametric geometry (alpha-helix, beta-strand, gamma-turn)
- * - Single draw-call THREE.Points & THREE.LineBufferGeometry
- * - Color-coded secondary structures (Alpha=Blue, Beta=Yellow, Gamma=Green, Coil=Grey)
+ * - C-alpha backbone trace using parametric geometry OR real experimental PDB coordinates
+ * - Multi-track color overlays: Secondary Structure, Aggregation Heatmap, Kyte-Doolittle Hydropathy
+ * - Synchronized 3D-to-Sequence highlighting
  * - Disulfide bridge connectivity rendering
+ * - High-res PNG publication snapshot exporter
  */
 
 class PrionVisualizer3D {
@@ -23,8 +24,11 @@ class PrionVisualizer3D {
     this.renderer = null;
     this.controls = null;
     this.proteinGroup = null;
+    this.highlightMarker = null;
 
-    this.residuePositions = []; // Array of { index, code, structure, pos: THREE.Vector3 }
+    this.currentModel = null;
+    this.colorMode = 'STRUCTURE'; // 'STRUCTURE' | 'RISK' | 'HYDROPATHY'
+    this.residuePositions = []; // Array of { index, code, structure, pos: THREE.Vector3, ... }
     this.hoveredResidueCallback = null;
 
     // Palette tokens
@@ -33,7 +37,8 @@ class PrionVisualizer3D {
       BETA: 0xeab308,   // Golden Amber
       GAMMA: 0x22c55e,  // Emerald Green
       COIL: 0x94a3b8,   // Slate Grey
-      BOND: 0x06b6d4    // Cyan
+      BOND: 0x06b6d4,   // Cyan
+      HOTSPOT: 0xf43f5e // Fiery Rose/Red for Dual-Track Steric Zippers
     };
 
     if (this.container && typeof THREE !== 'undefined') {
@@ -53,15 +58,19 @@ class PrionVisualizer3D {
     this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     this.camera.position.set(0, 20, 60);
 
-    // 3. Renderer (low spec optimized)
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'low-power' });
+    // 3. Renderer (low spec optimized, preserveDrawingBuffer for PNG export)
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      powerPreference: 'low-power',
+      preserveDrawingBuffer: true
+    });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.container.innerHTML = '';
     this.container.appendChild(this.renderer.domElement);
 
     // 4. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
     this.scene.add(ambientLight);
 
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
@@ -79,9 +88,21 @@ class PrionVisualizer3D {
     this.proteinGroup = new THREE.Group();
     this.scene.add(this.proteinGroup);
 
-    // 7. Raycaster for low-overhead hover inspection
+    // 7. Residue Highlight Marker (Pulsing sphere)
+    const markerGeo = new THREE.SphereGeometry(1.2, 12, 12);
+    const markerMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.8
+    });
+    this.highlightMarker = new THREE.Mesh(markerGeo, markerMat);
+    this.highlightMarker.visible = false;
+    this.scene.add(this.highlightMarker);
+
+    // 8. Raycaster for low-overhead hover inspection
     this.raycaster = new THREE.Raycaster();
-    this.raycaster.params.Points.threshold = 1.0;
+    this.raycaster.params.Points.threshold = 1.2;
     this.mouse = new THREE.Vector2();
 
     this.renderer.domElement.addEventListener('mousemove', (e) => this.onMouseMove(e));
@@ -91,8 +112,8 @@ class PrionVisualizer3D {
   }
 
   /**
-   * Convert linear parsed/predicted protein sequence into 3D C-alpha coordinates
-   * Using continuous geometric framing
+   * Convert linear protein sequence into 3D C-alpha coordinates
+   * Uses real experimental coords if available from PDB, otherwise continuous parametric model
    */
   generateBackboneCoordinates(residues) {
     const coords = [];
@@ -105,34 +126,40 @@ class PrionVisualizer3D {
       const res = residues[i];
       const structure = res.structure || 'COIL';
 
-      if (structure === 'ALPHA') {
-        // Parametric Alpha Helix: r = 2.3 Å, pitch = 1.5 Å, 100 deg/residue
-        helixAngle += (100 * Math.PI) / 180;
-        const radius = 2.3;
-        const dx = Math.cos(helixAngle) * radius;
-        const dy = Math.sin(helixAngle) * radius;
-        currentPos = currentPos.clone().add(currentDir.clone().multiplyScalar(1.5));
-        currentPos.x += dx * 0.4;
-        currentPos.y += dy * 0.4;
-      } else if (structure === 'BETA') {
-        // Extended Beta Strand: 3.5 Å rise, alternating pleated lateral shift
-        betaStep++;
-        const pleat = (betaStep % 2 === 0 ? 0.8 : -0.8);
-        currentPos = currentPos.clone().add(currentDir.clone().multiplyScalar(3.2));
-        currentPos.y += pleat;
-      } else if (structure === 'GAMMA') {
-        // Gamma Turn: sharp directional change
-        const turnAxis = new THREE.Vector3(0, 1, 0);
-        currentDir.applyAxisAngle(turnAxis, Math.PI / 4).normalize();
-        currentPos = currentPos.clone().add(currentDir.clone().multiplyScalar(2.4));
-      } else {
-        // Random Coil: gentle flexible wander
-        const wander = new THREE.Vector3(
-          (Math.sin(i * 0.7) - 0.5) * 1.2,
-          (Math.cos(i * 0.9) - 0.5) * 1.2,
-          2.0
+      if (res.experimentalCoords) {
+        // Use exact C-alpha coordinates from experimental PDB crystallography/NMR
+        currentPos = new THREE.Vector3(
+          res.experimentalCoords.x,
+          res.experimentalCoords.y,
+          res.experimentalCoords.z
         );
-        currentPos = currentPos.clone().add(wander);
+      } else {
+        // Parametric geometric formulation
+        if (structure === 'ALPHA') {
+          helixAngle += (100 * Math.PI) / 180;
+          const radius = 2.3;
+          const dx = Math.cos(helixAngle) * radius;
+          const dy = Math.sin(helixAngle) * radius;
+          currentPos = currentPos.clone().add(currentDir.clone().multiplyScalar(1.5));
+          currentPos.x += dx * 0.4;
+          currentPos.y += dy * 0.4;
+        } else if (structure === 'BETA') {
+          betaStep++;
+          const pleat = (betaStep % 2 === 0 ? 0.8 : -0.8);
+          currentPos = currentPos.clone().add(currentDir.clone().multiplyScalar(3.2));
+          currentPos.y += pleat;
+        } else if (structure === 'GAMMA') {
+          const turnAxis = new THREE.Vector3(0, 1, 0);
+          currentDir.applyAxisAngle(turnAxis, Math.PI / 4).normalize();
+          currentPos = currentPos.clone().add(currentDir.clone().multiplyScalar(2.4));
+        } else {
+          const wander = new THREE.Vector3(
+            (Math.sin(i * 0.7) - 0.5) * 1.2,
+            (Math.cos(i * 0.9) - 0.5) * 1.2,
+            2.0
+          );
+          currentPos = currentPos.clone().add(wander);
+        }
       }
 
       coords.push({
@@ -140,6 +167,9 @@ class PrionVisualizer3D {
         code: res.code,
         structure,
         confidence: res.confidence,
+        margin: res.margin,
+        hydrophobicity: res.hydrophobicity,
+        isDualTrackHotspot: res.isDualTrackHotspot,
         pos: currentPos.clone()
       });
     }
@@ -154,10 +184,70 @@ class PrionVisualizer3D {
   }
 
   /**
+   * Determine color based on active Color Mode
+   */
+  getResidueColor(item) {
+    if (this.colorMode === 'RISK') {
+      // Aggregation Heatmap:
+      if (item.isDualTrackHotspot) return new THREE.Color(this.COLORS.HOTSPOT); // Fiery red
+      if (item.structure === 'BETA') return new THREE.Color(this.COLORS.BETA);   // Amber
+      if (item.structure === 'ALPHA') return new THREE.Color(0x38bdf8);          // Cyan/Blue
+      return new THREE.Color(0x475569);                                          // Dark Slate
+    }
+
+    if (this.colorMode === 'HYDROPATHY') {
+      // Kyte-Doolittle Color Ramp (-4.5 hydrophilic blue -> 0 white -> +4.5 hydrophobic orange/red)
+      const h = item.hydrophobicity !== undefined ? item.hydrophobicity : 0.0;
+      const normalized = Math.max(-1, Math.min(1, h / 4.5));
+      if (normalized >= 0) {
+        // White to Red-Orange
+        return new THREE.Color().lerpColors(new THREE.Color(0xffffff), new THREE.Color(0xf97316), normalized);
+      } else {
+        // Blue to White
+        return new THREE.Color().lerpColors(new THREE.Color(0x3b82f6), new THREE.Color(0xffffff), 1 + normalized);
+      }
+    }
+
+    // Default: Secondary Structure Mode
+    const hexColor = this.COLORS[item.structure] || this.COLORS.COIL;
+    return new THREE.Color(hexColor);
+  }
+
+  /**
+   * Switch color overlay mode ('STRUCTURE' | 'RISK' | 'HYDROPATHY')
+   */
+  setColorMode(mode) {
+    this.colorMode = mode;
+    if (this.currentModel) {
+      this.renderProtein(this.currentModel);
+    }
+  }
+
+  /**
+   * Highlight a specific residue by index (synchronized with sequence strip)
+   */
+  highlightResidue(index) {
+    if (!this.highlightMarker) return;
+    if (index === null || index === undefined) {
+      this.highlightMarker.visible = false;
+      return;
+    }
+
+    const target = this.residuePositions.find(r => r.index === index);
+    if (target) {
+      this.highlightMarker.position.copy(target.pos);
+      this.highlightMarker.visible = true;
+    } else {
+      this.highlightMarker.visible = false;
+    }
+  }
+
+  /**
    * Render protein model with 3D points, continuous backbone line, and disulfide bridges
    */
   renderProtein(proteinModel) {
     if (!this.proteinGroup) return;
+    this.currentModel = proteinModel;
 
     // Clear previous objects
     while (this.proteinGroup.children.length > 0) {
@@ -176,8 +266,7 @@ class PrionVisualizer3D {
 
     this.residuePositions.forEach(item => {
       positions.push(item.pos.x, item.pos.y, item.pos.z);
-      const hexColor = this.COLORS[item.structure] || this.COLORS.COIL;
-      const color = new THREE.Color(hexColor);
+      const color = this.getResidueColor(item);
       colors.push(color.r, color.g, color.b);
     });
 
@@ -190,8 +279,8 @@ class PrionVisualizer3D {
       vertexColors: true,
       linewidth: 2
     });
-    const backboneLine = new THREE.Line(lineGeo, lineMat);
-    this.proteinGroup.add(backboneLine);
+    this.backboneLine = new THREE.Line(lineGeo, lineMat);
+    this.proteinGroup.add(this.backboneLine);
 
     // 2. Residue Vector Points (Ultra fast on low specs)
     const pointsGeo = new THREE.BufferGeometry();
@@ -199,7 +288,7 @@ class PrionVisualizer3D {
     pointsGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
     const pointsMat = new THREE.PointsMaterial({
-      size: 1.8,
+      size: 2.2,
       vertexColors: true,
       sizeAttenuation: true
     });
@@ -226,17 +315,26 @@ class PrionVisualizer3D {
       }
     });
 
-    // Reset camera position to fit bounding sphere
+    // Camera auto-framing
     lineGeo.computeBoundingSphere();
     const sphere = lineGeo.boundingSphere;
     if (sphere && this.camera) {
       const dist = sphere.radius * 2.8;
-      this.camera.position.set(0, dist * 0.5, dist);
+      this.camera.position.set(0, dist * 0.4, dist);
       this.camera.lookAt(0, 0, 0);
       if (this.controls) {
         this.controls.target.set(0, 0, 0);
       }
     }
+  }
+
+  /**
+   * Export high-resolution PNG snapshot of the 3D scene
+   */
+  exportSnapshot() {
+    if (!this.renderer || !this.scene || !this.camera) return null;
+    this.renderer.render(this.scene, this.camera);
+    return this.renderer.domElement.toDataURL('image/png');
   }
 
   onMouseMove(e) {
@@ -254,10 +352,12 @@ class PrionVisualizer3D {
       if (resData && typeof this.hoveredResidueCallback === 'function') {
         this.hoveredResidueCallback(resData, e.clientX, e.clientY);
       }
+      this.highlightResidue(resData.index);
     } else {
       if (typeof this.hoveredResidueCallback === 'function') {
         this.hoveredResidueCallback(null);
       }
+      this.highlightResidue(null);
     }
   }
 
@@ -274,9 +374,15 @@ class PrionVisualizer3D {
     requestAnimationFrame(() => this.animate());
     if (this.controls) this.controls.update();
 
-    // Gentle auto-rotation for 3D depth perception
-    if (this.proteinGroup) {
-      this.proteinGroup.rotation.y += 0.002;
+    if (this.highlightMarker && this.highlightMarker.visible) {
+      const time = Date.now() * 0.005;
+      const scale = 1.0 + Math.sin(time) * 0.2;
+      this.highlightMarker.scale.set(scale, scale, scale);
+    }
+
+    // Subtle idle auto-rotation
+    if (this.proteinGroup && (!this.controls || !this.controls.state || this.controls.state === -1)) {
+      this.proteinGroup.rotation.y += 0.0015;
     }
 
     if (this.renderer && this.scene && this.camera) {
@@ -285,7 +391,7 @@ class PrionVisualizer3D {
   }
 }
 
-// Browser export
+// Browser & Node export
 if (typeof window !== 'undefined') {
   window.PrionVisualizer3D = PrionVisualizer3D;
 }
