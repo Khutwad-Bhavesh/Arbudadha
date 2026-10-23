@@ -1,3 +1,5 @@
+// || श्री ||
+
 const fs = require('fs');
 const path = require('path');
 const { AAFParser } = require('../js/parser');
@@ -54,6 +56,17 @@ function runTests() {
 
   } catch (err) {
     console.error("  ❌ Unexpected Error during sample parsing:", err);
+  }
+
+  // Test 3: FASTA format parsing
+  try {
+    const { FASTAParser } = require('../js/parser');
+    const fastaSample = ">sp|P04156|PRIO_HUMAN Major prion protein\nMANLGYWLLALFVTMWTDVG\nLCKKRPKPGG";
+    const fastaRes = FASTAParser.parse(fastaSample);
+    assert(fastaRes.length === 30, "FASTA parsed 30 residues across multiple lines");
+    assert(fastaRes.name.includes("P04156"), "FASTA extracted header correctly");
+  } catch (err) {
+    console.error("  ❌ Unexpected Error during FASTA parsing:", err);
   }
 
   console.log(`\nResults: ${passed}/${total} tests passed.`);

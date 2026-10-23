@@ -326,7 +326,10 @@ END`
 
   function processContent(content) {
     try {
-      if (content.startsWith('HEADER') || content.startsWith('TITLE') || content.startsWith('ATOM')) {
+      if (content.startsWith('>') || content.startsWith(';')) {
+        // FASTA Format
+        currentProteinModel = FASTAParser.parse(content);
+      } else if (content.startsWith('HEADER') || content.startsWith('TITLE') || content.startsWith('ATOM')) {
         // PDB File Format
         currentProteinModel = PDBParser.parse(content);
       } else {

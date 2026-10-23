@@ -331,14 +331,64 @@ class PDBParser {
   }
 }
 
+class FASTAParser {
+  /**
+   * Parse FASTA sequence format (>header followed by sequence)
+   * @param {string} fastaText
+   * @returns {Object} Normalized protein model
+   */
+  static parse(fastaText) {
+    if (!fastaText || typeof fastaText !== 'string') {
+      throw new Error('FASTAError: Input must be a non-empty string');
+    }
+
+    const lines = fastaText.split(/\r?\n/);
+    let header = 'FASTA Protein';
+    let seq = '';
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      if (line.startsWith('>')) {
+        header = line.substring(1).trim();
+      } else {
+        seq += line.replace(/\s+/g, '').toUpperCase();
+      }
+    }
+
+    if (!seq) {
+      throw new Error('FASTAError: No valid amino acid sequence found in FASTA format');
+    }
+
+    const residues = seq.split('').map((code, idx) => ({
+      index: idx + 1,
+      code,
+      structure: 'COIL',
+      confidence: 1.0
+    }));
+
+    return {
+      version: '1.0',
+      chain: 'A',
+      name: header,
+      organism: 'FASTA Import',
+      type: 'prion',
+      length: residues.length,
+      residues,
+      bonds: []
+    };
+  }
+}
+
 // Module export for Node.js test suites
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { AAFParser, PDBParser };
+  module.exports = { AAFParser, PDBParser, FASTAParser };
 }
 
 // Browser export
 if (typeof window !== 'undefined') {
   window.AAFParser = AAFParser;
   window.PDBParser = PDBParser;
+  window.FASTAParser = FASTAParser;
 }
 
