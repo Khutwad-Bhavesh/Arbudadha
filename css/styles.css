@@ -258,6 +258,22 @@ select:focus {
   flex-direction: column;
 }
 
+.viewport-card.fullscreen-mode {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  border-radius: 0 !important;
+  padding: 1.25rem !important;
+  background: #0a0f1d !important;
+}
+
+.viewport-card.fullscreen-mode #viewport3D {
+  height: calc(100vh - 170px) !important;
+}
+
 .viewport-toolbar {
   display: flex;
   justify-content: space-between;

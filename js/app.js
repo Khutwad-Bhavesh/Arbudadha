@@ -310,6 +310,19 @@ END`
     });
   });
 
+  const btnFullscreen = document.getElementById('btnFullscreen');
+  if (btnFullscreen) {
+    btnFullscreen.addEventListener('click', () => {
+      const card = document.querySelector('.viewport-card');
+      if (card) {
+        card.classList.toggle('fullscreen-mode');
+        const isFull = card.classList.contains('fullscreen-mode');
+        btnFullscreen.textContent = isFull ? '✕ Exit' : '⛶ Fullscreen';
+        setTimeout(() => visualizer.onWindowResize(), 50);
+      }
+    });
+  }
+
   // 7. Research Export Suite
   if (btnExportCSV) {
     btnExportCSV.addEventListener('click', exportCSV);
