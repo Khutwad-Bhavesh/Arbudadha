@@ -374,14 +374,18 @@ END`
     });
 
     // Update Dashboard & Strip
-    updateDashboard(currentPredictionAnalysis.statistics, currentPredictionAnalysis.prionRisk);
+    updateDashboard(
+      currentPredictionAnalysis.statistics,
+      currentPredictionAnalysis.prionRisk,
+      currentPredictionAnalysis.chargeProfile
+    );
     renderSequenceStrip(currentProteinModel.residues);
 
     // Render in 3D
     visualizer.renderProtein(currentProteinModel);
   }
 
-  function updateDashboard(stats, risk) {
+  function updateDashboard(stats, risk, chargeProfile) {
     if (statAlpha) statAlpha.textContent = `${stats.alphaPercent}%`;
     if (statBeta) statBeta.textContent = `${stats.betaPercent}%`;
     if (statGamma) statGamma.textContent = `${stats.gammaPercent}%`;
@@ -393,7 +397,13 @@ END`
     }
     if (riskScoreVal) riskScoreVal.textContent = `${risk.score} / 100`;
     if (riskBarFill) riskBarFill.style.width = `${risk.score}%`;
-    if (riskDesc) riskDesc.textContent = risk.description;
+    if (riskDesc) {
+      let desc = risk.description;
+      if (chargeProfile) {
+        desc += `<br/><span style="color:#38bdf8; font-weight:600; display:inline-block; margin-top:0.3rem;">⚡ Net Charge (pH 7.4): ${chargeProfile.chargeStr}e (${chargeProfile.positiveResidues}+ / ${chargeProfile.negativeResidues}-)</span>`;
+      }
+      riskDesc.innerHTML = desc;
+    }
   }
 
   function renderSequenceStrip(residues) {

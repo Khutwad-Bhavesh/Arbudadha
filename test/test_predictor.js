@@ -58,6 +58,10 @@ function runTests() {
   assert(valResult.predictions.some(p => p.isDualTrackHotspot), "Dual-track validates Poly-Valine as amyloid hotspot");
   assert(samplePrediction.predictions.some(p => p.isDualTrackHotspot), "Detected dual-track steric-zipper hotspot in Human PrP");
 
+  // Test 6: Biophysical Net Charge
+  assert(typeof samplePrediction.chargeProfile.netCharge === 'number', "Computed net charge at pH 7.4");
+  assert(samplePrediction.chargeProfile.chargeStr.length > 0, "Formatted charge string present");
+
   console.log(`\nResults: ${passed}/${total} predictor tests passed.`);
   if (passed === total) {
     console.log('🏆 ChouFasmanPredictor verified! SIUUU! 🐐');

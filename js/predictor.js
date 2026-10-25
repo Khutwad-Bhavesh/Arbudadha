@@ -203,6 +203,23 @@ class ChouFasmanPredictor {
       riskDescription = 'Elevated beta-strand propensity in key motifs. Susceptible to seeded conformational transition.';
     }
 
+    // Step 6: Biophysical Net Charge at physiological pH 7.4
+    let posCount = 0;
+    let negCount = 0;
+    for (let i = 0; i < n; i++) {
+      const code = residueCodes[i];
+      if (code === 'K' || code === 'R') posCount++;
+      else if (code === 'D' || code === 'E') negCount++;
+      else if (code === 'H') posCount += 0.1;
+    }
+    const netCharge = parseFloat((posCount - negCount).toFixed(1));
+    const chargeProfile = {
+      netCharge,
+      positiveResidues: Math.round(posCount),
+      negativeResidues: negCount,
+      chargeStr: netCharge > 0 ? `+${netCharge}` : `${netCharge}`
+    };
+
     return {
       length: n,
       predictions,
@@ -213,6 +230,7 @@ class ChouFasmanPredictor {
         coilPercent
       },
       betaClusters,
+      chargeProfile,
       prionRisk: {
         level: riskLevel,
         score: Math.min(100, Math.round(betaPercent * 2.2 + betaClusters.length * 10)),
