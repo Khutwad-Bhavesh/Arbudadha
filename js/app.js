@@ -518,6 +518,28 @@ END`
     a.click();
   }
 
+  // 8. Share Link Button (URL Hash Deep-Linking)
+  const btnShareLink = document.getElementById('btnShareLink');
+  if (btnShareLink) {
+    btnShareLink.addEventListener('click', () => {
+      const activePreset = selSpecies ? selSpecies.value : '';
+      const activeMutation = selMutation ? selMutation.value : '';
+      const activeMode = visualizer ? visualizer.colorMode : 'STRUCTURE';
+
+      const params = new URLSearchParams();
+      if (activePreset) params.set('preset', activePreset);
+      if (activeMutation) params.set('mutation', activeMutation);
+      if (activeMode) params.set('mode', activeMode);
+
+      window.location.hash = params.toString();
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert('Deep-link copied to clipboard! Anyone opening this link will see this exact configuration.');
+      }).catch(() => {
+        prompt('Copy this shareable link:', window.location.href);
+      });
+    });
+  }
+
   // Keyboard Shortcuts: 1, 2, 3 for modes, R for camera reset
   window.addEventListener('keydown', (e) => {
     if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
@@ -535,8 +557,35 @@ END`
     }
   });
 
-  // Auto-load human sample on initial startup
-  if (btnLoadSample) {
+  function handleUrlHash() {
+    const hash = window.location.hash.substring(1);
+    if (!hash) return false;
+    const params = new URLSearchParams(hash);
+    const preset = params.get('preset');
+    const mut = params.get('mutation');
+    const mode = params.get('mode');
+
+    if (preset && PRESETS[preset]) {
+      if (selSpecies) selSpecies.value = preset;
+      aafInput.value = PRESETS[preset];
+      processContent(PRESETS[preset]);
+    }
+    if (mut && selMutation) {
+      selMutation.value = mut;
+      selMutation.dispatchEvent(new Event('change'));
+    }
+    if (mode) {
+      visualizer.setColorMode(mode);
+      modePills.forEach(p => {
+        if (p.dataset.mode === mode) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+    }
+    return Boolean(preset);
+  }
+
+  // Auto-load human sample or hash state on startup
+  if (!handleUrlHash() && btnLoadSample) {
     btnLoadSample.click();
   }
 });
